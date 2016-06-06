@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+        <head>
+                <meta charset="UTF-8">
+                <title>Canvas实现电影院选座</title>
+        </head>
+        <style>
+                * {
+                        margin: 0;
+                        padding: 0;
+                }
+                
+                body {
+                        background-color: skyblue;
+                }
+                
+                .header {
+                        margin: 0 auto;
+                        height: 50px;
+                        line-height: 50px;
+                        width: 500px;
+                        font-size: 30px;
+                        font-weight: bold;
+                        color: darkmagenta;
+                        text-align: center;
+                }
+                
+                .seat {
+                        height: 650px;
+                        width: 1010px;
+                        margin: 0 auto;
+                }
+                
+                #cv {
+                        margin: 0 auto;
+                        border: dashed 2px white;
+                        border-radius: 10px;
+                }
+                #prompt{
+                        height: 20px;
+                        margin-left:20px;
+                        line-height: 20px;
+                        font-size: 20px;
+                }
+        </style>
+
+        <body>
+                <div class="header">欢迎来到隔壁小王国际影城</div>
+                <div class="seat">
+
+                        <canvas id="cv" height="600" width="1000">
+                                
+                        <p>当前浏览器不支持canvas！</p>
+                        
+                        </canvas>
+                        
+                        <p id="prompt"></p>
+
+                </div>
+
+                <script>
+                        (function() {
+                                
+                                var $ = function(id) {
+                                        return document.getElementById(id);
+                                };
+                                
+                                var canvas = $("cv");
+                                var p = $("prompt");
+                                var checknum=0;
+                                var ctx = canvas.getContext("2d");
+                                var position1 = {};
+                                
+                                //前方半圆银幕区：
+                                ctx.lineWidth = 1;
+                                ctx.beginPath();
+                                ctx.arc(500, -300, 400, 0.3, 0.9 * Math.PI, false);
+                                ctx.closePath();
+                                ctx.stroke();
+                                ctx.font = "30px Verdana";
+                                ctx.strokeText("中央银幕", 450, 50);
+                                
+                                //创建座位：
+                                var num = 0
+                                for (var m = 1; m <= 22; m++) {
+                                        for (n = 1; n <= 11; n++) {
+                                                if (m == 6 || m == 17) {
+                                                        continue;
+                                                }
+                                                if (n == 6) {
+                                                        continue;
+                                                }
+                                                
+                                                ctx.fillStyle = "#DFDFDF";
+                                                ctx.fillRect(70 + (40 * (m - 1)), 150 + (40 * (n - 1)), 30, 30);
+                                                num++;
+                                                ctx.strokeStyle = "black";
+                                                ctx.strokeRect(70 + (40 * (m - 1)), 150 + (40 * (n - 1)), 30, 30);
+                                                position1["seat" + num] = [70 + (40 * (m - 1)), 70 + (40 * (m - 1)) + 30, 150 + (40 * (n - 1)), 150 + (40 * (n - 1)) + 30, true];
+                                        }
+                                };
+                                
+                                console.log(position1);
+                                
+                                //点击选取座位时变色：
+                                canvas.onclick = function(e) {
+                                        
+                                        var x = e.layerX;
+                                        var y = e.layerY;
+                                        
+                                        console.log("this is current position    " + x + "——" + y);
+                                        
+                                        for (var t in position1) {
+                                                
+                                                var item = position1[t];
+                                                
+                                                if (x > item[0] && x < item[1] && y > item[2] && y < item[3]) {
+                                                        
+                                                        console.log(item[0]+"——"+item[1]+"——"+item[2]+"——"+item[3]+"——"+item[4]);
+                                                        
+                                                        if (item[4] == true) {
+                                                                ctx.fillStyle = "red";
+                                                                ctx.fillRect(item[0], item[2], 30, 30);
+                                                                ctx.strokeStyle = "black";
+                                                                ctx.strokeRect(item[0], item[2], 30, 30);
+                                                                item[4] = false;
+                                                                checknum++;        
+                                                                
+                                                        } else {
+                                                                
+                                                                ctx.fillStyle = "#DFDFDF";
+                                                                ctx.fillRect(item[0], item[2], 30, 30);
+                                                                ctx.strokeStyle = "black";
+                                                                ctx.strokeRect(item[0], item[2], 30, 30);
+                                                                item[4] = true;
+                                                                checknum--;
+                                                        }        
+                                                }
+                                        }
+                                        
+                                        p.innerHTML = "可选座位："+(num-checknum)+"          "+"当前已选："+checknum;
+                                }
+                                
+                                canvas.click();
+                                
+                        }());
+                        
+                        
+                </script>
+
+        </body>
+
+</html>
